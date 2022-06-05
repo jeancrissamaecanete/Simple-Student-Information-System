@@ -9,13 +9,14 @@ root.title("Student Information System")
 root.geometry("825x580")
 root.maxsize(825, 580)
 root.iconbitmap(r'app_icon.ico')
+
 #Frames
 content = Frame(root, bg="#98B6D4")
 content.place(x=0, y=50, width=1000, height=700)
 subSearch = Frame(root, bg="#98B6D4")
 subSearch.place(x=0, y=0, width=1200, height=50)
 searchContent = Frame(root, bg="#98B6D4")
-searchContent.place(x=20, y=190, width=800, height=500)
+searchContent.place(x=20, y=190, width=800, height=370)
 #Data Title
 header = Label(content, text="Student Information", fg="#23395d", bg="#98B6D4", font=("Arial", 15, "bold"))
 header.place(x=325,y=-5)
@@ -135,8 +136,8 @@ def edit():
 
     remove()
 
-    nameEntry.insert(0, values[0])
-    idnumberEntry.insert(0, values[1])
+    idnumberEntry.insert(0, values[0])
+    nameEntry.insert(0, values[1])
     courseEntry.insert(0, values[2])
     yearEntry.insert(0, values[3])
     genderEntry.insert(0, values[4])
