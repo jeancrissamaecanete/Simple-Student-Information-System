@@ -66,22 +66,45 @@ def tree():
             gender = row["gender"]
             view.insert("", 0, values=(idnumber, name, course, year, gender))
 
+def clear():
+    nameEntry.delete(0, END)
+    idnumberEntry.delete(0, END)
+    courseEntry.delete(0, END)
+    yearEntry.delete(0, END)
+    genderEntry.delete(0, END)
+    searchBy.delete(0, END)
+
+clear()
+
+
 def showall():
     view.delete(*view.get_children())
     tree()
+    clear()
 
 def add():
-    if nameEntry.get() == "":
-        messagebox.showerror("Error", "There are some missing input.")
-    elif idnumberEntry.get() == "":
-        messagebox.showerror("Error", "There are some missing input.")
-    elif courseEntry.get() == "":
-        messagebox.showerror("Error", "There are some missing input.")
-    elif yearEntry.get() == "":
-        messagebox.showerror("Error", "There are some missing input.")
-    elif genderEntry.get() == "":
-        messagebox.showerror("Error", "There are some missing input.")
+    a1 = idnumberEntry.get()
+    a2 = nameEntry.get()
+    a3 = courseEntry.get()
+    a4 = yearEntry.get()
+    a5 = genderEntry.get()
 
+    try:
+        if (a1 == '') or (a2 == '') or (a3 == '') or (a4 == '') or (a5 == ''):
+            messagebox.showerror("Error", "Please fill all the missing input.")
+            return
+        y = str(a1)
+        y = str(y.replace('-', ''))
+        a1 = int(y)
+        a1 = str(a1)
+        if len(a1) != 8:
+            messagebox.showerror("Error", "I.D. No. must be exactly 8 numbers.\n(Ex: 2020-1570)")
+            return
+        else:
+            a1 = '%s-%s' % (a1[:4], a1[4:8])
+    except ValueError:
+        messagebox.showerror("Error", "I.D. No. must only contain numbers.")
+        return
     else:
         data = []
         data.append(idnumberEntry.get())
@@ -94,18 +117,17 @@ def add():
             w = csv.writer(f)
             w.writerow(data)
             view.insert("", 0, values=(data))
+            messagebox.showinfo("Success", "Student has been added successfully.")
 
-        nameEntry.delete(0, END)
-        idnumberEntry.delete(0, END)
-        courseEntry.delete(0, END)
-        yearEntry.delete(0, END)
-        genderEntry.delete(0, END)
-
+        clear()
         showall()
 
-        messagebox.showinfo("Success", "Student has been added successfully.")
 
 def remove():
+    if not view.selection():
+        messagebox.showerror('Error', 'Please select a student first to delete.')
+        return
+
     selected = view.selection()
     values = view.item(selected, "values")
     query = values[0]
@@ -120,21 +142,39 @@ def remove():
                     pass
                 else:
                     csv_file.write(f"{row}")
-        view.delete(selected)
-        showall()
-
+        decision = messagebox.askquestion("Warning", "Do you want to delete the selected student?")
+        if decision == "yes":
+            view.delete(selected)
+            messagebox.showinfo("Success", "Student has been deleted successfully.")
+            showall()
 
 def edit():
-    nameEntry.delete(0, END)
-    idnumberEntry.delete(0, END),
-    courseEntry.delete(0, END)
-    yearEntry.delete(0, END)
-    genderEntry.delete(0, END)
+    if not view.selection():
+        messagebox.showerror('Error', 'Please select a student first to delete.')
+        return
+
+    clear()
 
     selected = view.focus()
     values = view.item(selected, "values")
-
-    remove()
+    query = values[0]
+    decision = messagebox.askquestion("Warning", "Do you want to update the selected student?")
+    if decision == "no":
+        clear()
+        return
+    if decision == "yes":
+        if bool(query) is False:
+            pass
+        else:
+            data = open("Student Data.csv", "r").readlines()
+            with open("Student Data.csv", "w") as csv_file:
+                for row in data:
+                    if query in row:
+                        pass
+                    else:
+                        csv_file.write(f"{row}")
+            view.delete(selected)
+            showall()
 
     idnumberEntry.insert(0, values[0])
     nameEntry.insert(0, values[1])
@@ -142,31 +182,70 @@ def edit():
     yearEntry.insert(0, values[3])
     genderEntry.insert(0, values[4])
 
-
 def save():
-    selected = view.focus()
-    view.item(selected, text="", values=(
-    nameEntry.get(), idnumberEntry.get(), courseEntry.get(), yearEntry.get(), genderEntry.get()))
-    add()
 
-    nameEntry.delete(0, END)
-    idnumberEntry.delete(0, END)
-    courseEntry.delete(0, END)
-    yearEntry.delete(0, END)
-    genderEntry.delete(0, END)
+    idnumber = str(idnumberEntry.get())
+    name = str(nameEntry.get())
+    course = str(courseEntry.get())
+    year = str(yearEntry.get())
+    gender = str(genderEntry.get())
 
+    if (idnumber == "" or idnumber == " ") or (name == "" or name == " ") or (course == "" or course == " ") or (
+            year == "" or year == " ") or (gender == "" or gender == " "):
+        messagebox.showerror("Error", "Please edit a student first to save changes.")
+        return
+
+    else:
+        try:
+            selected = view.focus()
+            view.item(selected, text="", values=(
+            nameEntry.get(), idnumberEntry.get(), courseEntry.get(), yearEntry.get(), genderEntry.get()))
+            decision = messagebox.askquestion("Warning", "Do you want to save changes?")
+            if decision == "no":
+                clear()
+                return
+            if decision == "yes":
+                add()
+                return
+        except:
+            messagebox.showinfo("Unsuccessful", "Updating student unsuccessful. Please try again.")
+            return
+            clear()
 
 def search():
     query = searchBy.get()
 
     if query == "":
-        messagebox.showerror("Error", "Please enter some keyword.")
+        messagebox.showerror("Error", "Please enter an I.D. No. first to search for a student.")
+        return
+    try:
+        y = str(query)
+        y = str(y.replace('-', ''))
+        query = int(y)
+        query = str(query)
+
+        if len(query) != 8:
+            messagebox.showerror("Error", "I.D. No. must be exactly 8 numbers.\n( Ex: 2020-1570 )")
+            return
+        else:
+            query = '%s-%s' % (query[:4], query[4:8])
+    except ValueError:
+        messagebox.showerror("Error", "Please enter only the I.D. No. to search for a student.")
+        return
+
     else:
         with open("Student Data.csv", "r") as f:
             for row in f:
                     if query in row:
                         view.delete(*view.get_children())
                         view.insert("", "end", values=(row.split(",")))
+                        messagebox.showinfo("Success", "Student is found.")
+                        clear()
+                        return
+                    else:
+                        messagebox.showerror("Error", "Student does not exists. Please try again.")
+                        return
+
 
 #Add Button
 addButton = Button(content, text="Add", width=5, font=("Roboto", 10, "bold"), fg="#FFFFFF", bg="#7B9FCF", command=add)
@@ -181,7 +260,7 @@ deleteButton.place(x=543, y=90)
 saveButton = Button(content, text="Save", width=5, font=("Roboto", 10, "bold"), fg="#FFFFFF", bg="#7B9FCF", command=save)
 saveButton.place(x=602, y=90)
 #Show All Button
-displayButton = Button(subSearch, text="Show All", width=8, font=("Roboto", 10, "bold"), fg="#FFFFFF", bg="#7B9FCF", command=showall)
+displayButton = Button(subSearch, text="Refresh", width=8, font=("Roboto", 10, "bold"), fg="#FFFFFF", bg="#7B9FCF", command=showall)
 displayButton.place(x=730, y=10)
 #Search Button
 searchButton = Button(subSearch, text="Search", width=6, font=("Roboto", 10, "bold"), fg="#FFFFFF", bg="#7B9FCF", command=search)
