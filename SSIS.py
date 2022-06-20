@@ -9,8 +9,7 @@ root.title("Student Information System")
 root.geometry("825x580")
 root.maxsize(825, 580)
 root.iconbitmap(r'app_icon.ico')
-
-#Frames
+#================================================================FRAMES========================================================================================
 content = Frame(root, bg="#98B6D4")
 content.place(x=0, y=50, width=1000, height=700)
 subSearch = Frame(root, bg="#98B6D4")
@@ -18,8 +17,9 @@ subSearch.place(x=0, y=0, width=1200, height=50)
 searchContent = Frame(root, bg="#98B6D4")
 searchContent.place(x=20, y=190, width=800, height=370)
 #Data Title
-header = Label(content, text="Student Information", fg="#23395d", bg="#98B6D4", font=("Arial", 15, "bold"))
-header.place(x=325,y=-5)
+header = Label(content, text="Student Information System", fg="#23395d", bg="#98B6D4", font=("Arial",16, "bold"))
+header.place(x=300,y=-3)
+#================================================================ENTRIES====================================================================================
 #Search Field
 searchBy = Entry(subSearch, font=("Roboto", 10))
 searchBy.place(x=490, y=10, height=25, width=163)
@@ -54,7 +54,7 @@ j = ["Male", "Female"]
 genderEntry = ttk.Combobox(content, font=("Roboto", 10), values=j)
 genderEntry.pack()
 genderEntry.place(x=490, y=55)
-
+#===========================================================FUNCTIONS========================================================================================
 def tree():
     with open("Student Data.csv") as f:
         r = csv.DictReader(f, delimiter=",")
@@ -75,7 +75,6 @@ def clear():
     searchBy.delete(0, END)
 
 clear()
-
 
 def showall():
     view.delete(*view.get_children())
@@ -122,16 +121,13 @@ def add():
         clear()
         showall()
 
-
 def remove():
     if not view.selection():
         messagebox.showerror('Error', 'Please select a student first to delete.')
         return
-
     selected = view.selection()
     values = view.item(selected, "values")
     query = values[0]
-
     if bool(query) is False:
         pass
     else:
@@ -232,7 +228,6 @@ def search():
     except ValueError:
         messagebox.showerror("Error", "Please enter only the I.D. No. to search for a student.")
         return
-
     else:
         with open("Student Data.csv", "r") as f:
             for row in f:
@@ -245,8 +240,7 @@ def search():
                     else:
                         messagebox.showerror("Error", "Student does not exists. Please try again.")
                         return
-
-
+#===================================================================BUTTONS=========================================================================================
 #Add Button
 addButton = Button(content, text="Add", width=5, font=("Roboto", 10, "bold"), fg="#FFFFFF", bg="#7B9FCF", command=add)
 addButton.place(x=428, y=90)
@@ -265,6 +259,7 @@ displayButton.place(x=730, y=10)
 #Search Button
 searchButton = Button(subSearch, text="Search", width=6, font=("Roboto", 10, "bold"), fg="#FFFFFF", bg="#7B9FCF", command=search)
 searchButton.place(x=665, y=10)
+#=================================================================TREEVIEW====================================================================================
 #Scrollbar
 scrollx = Scrollbar(searchContent)
 scrollx.pack(side=RIGHT, fill=Y)
